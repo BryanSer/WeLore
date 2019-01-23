@@ -1,0 +1,4 @@
+*.rar
+/.idea/*
+*.jar
+/target/*
