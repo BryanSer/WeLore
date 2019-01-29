@@ -82,31 +82,6 @@ data class AttributeData(
         val data: MutableMap<String, AttributeInfo> = HashMap()
 )
 
-open class AttributeInfo(
-        val attribute: Attribute<AttributeInfo>,
-        var value: Double = 0.0
-) {
-    open fun checkLimit(p: AttributeEntity): Boolean {
-        if (p is Player) {
-            if (this is Limit && !this.checkLimit(p)) {
-                return false
-            }
-        }
-        return true
-    }
-
-    open fun checkRandom(p: AttributeEntity): Boolean {
-        if (this is Probability && !this.randomCast(p)) {
-            return false
-        }
-        return true
-    }
-
-
-    fun add(other: AttributeInfo) {
-        attribute.infoAddFunction(this, other)
-    }
-}
 
 interface Limit {
     fun getLimitType(): LimitType
