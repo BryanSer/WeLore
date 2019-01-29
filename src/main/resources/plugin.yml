@@ -1,0 +1,5 @@
+name: WeLore
+authors: ['Bryan_lzh']
+main: br.kt.welore.Main
+depend: [BrAPI]
+version: 1.0-SNAPSHOT
