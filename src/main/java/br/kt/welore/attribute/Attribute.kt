@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack
 
 typealias AttributeEntity = LivingEntity
 
-abstract class Attribute<T : AttributeInfo>(
+abstract class Attribute<out T : AttributeInfo>(
         val name: String,
         val displayName: String,
         val priority: Int,
@@ -19,19 +19,19 @@ abstract class Attribute<T : AttributeInfo>(
     open fun isApplicable(item: ItemStack): Boolean = true
 
     open fun infoAddFunction(info: AttributeInfo, other: AttributeInfo) {
-        info.value = other.value
+        info.value += other.value
     }
 
     abstract fun readAttribute(lore: String): T?
 
-    open fun apply(p: AttributeEntity, value: T, data: AttributeApplyData) {
+    open fun apply(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData) {
         if (data.jumpApply) {
             return
         }
         this.applyAttribute(p, value, data)
     }
 
-    abstract fun applyAttribute(p: AttributeEntity, value: T, data: AttributeApplyData)
+    abstract fun applyAttribute(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData)
 }
 
 open class AttributeApplyData(
@@ -40,6 +40,10 @@ open class AttributeApplyData(
         var cancel: Boolean = false,
         var jumpApply: Boolean = false
 ) {
+    operator fun get(path: String): Any? {
+        return data[path]
+    }
+
     fun data(namespace: String, key: String): Any? {
         return data["$namespace.$key"]
     }
@@ -52,11 +56,11 @@ open class AttributeApplyData(
         return data["Entity.$namespace.$key"]
     }
 
-    fun <T : AttributeInfo> entity(attr: String): T? {
+    private fun <T : AttributeInfo> entity(attr: String): T? {
         return entityAttribute.data[attr] as T
     }
 
-    fun entity(attr: Attribute<AttributeInfo>): AttributeInfo? = entity(attr.name)
+    fun entity(attr: Attribute<out AttributeInfo>): AttributeInfo? = entity(attr.name)
 }
 
 class AttributeDamageApplyData(
@@ -69,11 +73,11 @@ class AttributeDamageApplyData(
         return data["Damager.$namespace.$key"]
     }
 
-    fun <T : AttributeInfo> damager(attr: String): T? {
+    private fun <T : AttributeInfo> damager(attr: String): T? {
         return damagerAttribute.data[attr] as T
     }
 
-    fun damager(attr: Attribute<AttributeInfo>): AttributeInfo? = damager(attr.name)
+    fun damager(attr: Attribute<out AttributeInfo>): AttributeInfo? = damager(attr.name)
 }
 
 data class AttributeData(

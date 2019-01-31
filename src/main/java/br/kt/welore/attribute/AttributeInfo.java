@@ -32,4 +32,11 @@ public class AttributeInfo {
         attribute.infoAddFunction(this, other);
     }
 
+    public Attribute<AttributeInfo> getAttribute() {
+        return attribute;
+    }
+
+    public double getValue() {
+        return value;
+    }
 }

@@ -2,6 +2,7 @@ package br.kt.welore.attribute
 
 import Br.API.Utils
 import br.kt.welore.Main
+import br.kt.welore.attribute.welore.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -11,13 +12,12 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityEvent
 import org.bukkit.inventory.ItemStack
 import java.lang.ref.WeakReference
 import java.util.*
 
-val cacheTime: Long = 1000
-val NAMESPACE_EVENT = "Event"
 
 class AttributeLoadEvent(p: Entity, val data: AttributeData) : EntityEvent(p) {
     companion object {
@@ -36,11 +36,16 @@ class AttributeLoadEvent(p: Entity, val data: AttributeData) : EntityEvent(p) {
 }
 
 object AttributeManager : Listener {
+    val cacheTime: Long = 1000
+    @JvmStatic
+    val NAMESPACE_EVENT = "Event"
+    val EVENT_DAMAGE = "Damage"
+    val EVENT_DAMAGECAUSE = "DamageCause"
 
-    val registeredAttribute: MutableMap<String, Attribute<in AttributeInfo>> = HashMap()
+    val registeredAttribute: MutableMap<String, Attribute<out AttributeInfo>> = HashMap()
     val playerAttributeCache: MutableMap<String, AttributeData> = HashMap()
 
-    val sortedAttribute: MutableList<Attribute<in AttributeInfo>> = ArrayList()
+    val sortedAttribute: MutableList<Attribute<out AttributeInfo>> = ArrayList()
 
     var experimentalCache: Boolean = true//实验性属性缓存功能
     private val attributeCache: MutableMap<String, WeakReference<AttributeInfo>?> = WeakHashMap()
@@ -104,7 +109,7 @@ object AttributeManager : Listener {
         return evt.data
     }
 
-    fun getShooter(e: Projectile): LivingEntity? {
+    private fun getShooter(e: Projectile): LivingEntity? {
         val s = e.shooter
         if (s == null || s !is LivingEntity) {
             return null
@@ -125,12 +130,38 @@ object AttributeManager : Listener {
             return
         val entity: LivingEntity = evt.entity as LivingEntity
         val data = AttributeDamageApplyData(getAttribute(entity), getAttribute(damager))
-        data.data["$NAMESPACE_EVENT.Damage"] = evt.damage
+        data.data["$NAMESPACE_EVENT.$EVENT_DAMAGE"] = evt.damage  //记录伤害
+        data.data["$NAMESPACE_EVENT.$EVENT_DAMAGECAUSE"] = evt.cause // 记录原因
         //call event
         for (attr in sortedAttribute) {
             if (attr.type.contains(AttributeType.ATTACK)) {
                 attr.apply(damager, data.damager(attr) ?: continue, data)
             }
+            if (attr.type.contains(AttributeType.DEFENCE)) {
+                attr.apply(entity, data.entity(attr) ?: continue, data)
+            }
+        }
+        var finaldamage = data["$NAMESPACE_EVENT.$EVENT_DAMAGE"] as Double
+        finaldamage += data["DamageBoostAttribute.Value"] as? Double ?: 0.0
+        finaldamage *= (1.0 + (data["DamageBoostAttribute.Rate"] as? Double ?: 0.0))
+        evt.damage = finaldamage
+        val refdmg = data["ReflectionAttribute.RefDamage"] as? Double
+        if (refdmg != null) {
+            damager.damage(refdmg)
+        }
+    }
+
+    @EventHandler
+    fun onDamage(evt: EntityDamageEvent) {
+        if (evt is EntityDamageByEntityEvent) return
+        if (evt.entity !is LivingEntity)
+            return
+        val entity: LivingEntity = evt.entity as LivingEntity
+        val data = AttributeApplyData(getAttribute(entity))
+        data.data["$NAMESPACE_EVENT.$EVENT_DAMAGE"] = evt.damage  //记录伤害
+        data.data["$NAMESPACE_EVENT.$EVENT_DAMAGECAUSE"] = evt.cause // 记录原因
+        //call event
+        for (attr in sortedAttribute) {
             if (attr.type.contains(AttributeType.DEFENCE)) {
                 attr.apply(entity, data.entity(attr) ?: continue, data)
             }
@@ -163,10 +194,31 @@ object AttributeManager : Listener {
     @JvmStatic
     fun init() {
         Bukkit.getPluginManager().registerEvents(this, Main.getInstance())
+        val list = setOf(
+                DamageAttribute(),
+                DamagePercentAttribute(),
+                DefenceAttribute(),
+                ResistanceAttribute(),
+                ArmorPenetrationAttribute,
+                ArmorPenetrationPercentAttribute,
+                DodgeAttribute,
+                ReflectionAttribute,
+                DamageBoostAttribute,
+                MoveSpeedAttribute,
+                PermissionLimit,
+                LevelLimit,
+                MoneyLimit,
+                PointLimit,
+                ExpAttribute
+        )
+
+        for (atr in list) {
+            registeredAttribute[atr.name] = atr
+        }
 
         sortedAttribute.addAll(registeredAttribute.values)
         sortedAttribute.sortBy {
-            -it.priority
+            it.priority
         }
 
         Bukkit.getScheduler().runTaskTimer(Main.getInstance(), object : Runnable {
@@ -181,7 +233,7 @@ object AttributeManager : Listener {
             }
 
             override fun run() {
-                val active: MutableList<Attribute<AttributeInfo>> = ArrayList()
+                val active: MutableList<Attribute<out AttributeInfo>> = ArrayList()
                 for (attr in sortedAttribute) {
                     if (attr.type.contains(AttributeType.PASSIVE)) {
                         var t = lastCall[attr.name] ?: 0 + 1
