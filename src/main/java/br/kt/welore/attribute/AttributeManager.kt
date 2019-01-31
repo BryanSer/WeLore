@@ -13,6 +13,7 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.EntityEvent
 import org.bukkit.inventory.ItemStack
 import java.lang.ref.WeakReference
@@ -43,7 +44,7 @@ object AttributeManager : Listener {
     val EVENT_DAMAGECAUSE = "DamageCause"
 
     val registeredAttribute: MutableMap<String, Attribute<out AttributeInfo>> = HashMap()
-    val playerAttributeCache: MutableMap<String, AttributeData> = HashMap()
+    val playerAttributeCache: MutableMap<Int, AttributeData> = HashMap()
 
     val sortedAttribute: MutableList<Attribute<out AttributeInfo>> = ArrayList()
 
@@ -53,7 +54,7 @@ object AttributeManager : Listener {
     fun getAttribute(e: AttributeEntity): AttributeData {
         var result: AttributeData? = null
         if (e is Player) {
-            result = playerAttributeCache[e.name]
+            result = playerAttributeCache[e.entityId]
         }
         if (result != null) {
             if (System.currentTimeMillis() - result.cacheTime < cacheTime) {
@@ -61,7 +62,7 @@ object AttributeManager : Listener {
                 Bukkit.getPluginManager().callEvent(evt)
                 return evt.data
             }
-            playerAttributeCache.remove(e.name)
+            playerAttributeCache.remove(e.entityId)
         }
         result = AttributeData(e, System.currentTimeMillis())
         val items: MutableList<ItemStack> = ArrayList()
@@ -102,7 +103,7 @@ object AttributeManager : Listener {
             }
         }
         if (e is Player) {
-            playerAttributeCache[e.name] = result
+            playerAttributeCache[e.entityId] = result
         }
         val evt = AttributeLoadEvent(e, result.copy())
         Bukkit.getPluginManager().callEvent(evt)
@@ -166,6 +167,11 @@ object AttributeManager : Listener {
                 attr.apply(entity, data.entity(attr) ?: continue, data)
             }
         }
+    }
+
+    @EventHandler
+    fun onDeath(evt: EntityDeathEvent) {
+        playerAttributeCache.remove(evt.entity.entityId)
     }
 
     data class AttributeInfoCache(val info: AttributeInfo?, val contains: Boolean)

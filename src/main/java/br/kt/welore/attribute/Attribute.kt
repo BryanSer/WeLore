@@ -57,7 +57,7 @@ open class AttributeApplyData(
     }
 
     private fun <T : AttributeInfo> entity(attr: String): T? {
-        return entityAttribute.data[attr] as T
+        return entityAttribute.data[attr] as T?
     }
 
     fun entity(attr: Attribute<out AttributeInfo>): AttributeInfo? = entity(attr.name)
@@ -74,7 +74,7 @@ class AttributeDamageApplyData(
     }
 
     private fun <T : AttributeInfo> damager(attr: String): T? {
-        return damagerAttribute.data[attr] as T
+        return damagerAttribute.data[attr] as T?
     }
 
     fun damager(attr: Attribute<out AttributeInfo>): AttributeInfo? = damager(attr.name)
