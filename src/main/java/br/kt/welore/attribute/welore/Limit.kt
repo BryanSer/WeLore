@@ -27,6 +27,7 @@ object PointLimit : Attribute<AttributeInfo>(
                 ), Limit {
                     override fun getLimitType(): LimitType = LimitType.POINT
                     override fun checkLimit(p: Player): Boolean = API.look(p.name) >= this.value
+
                 }
             }
         }
@@ -128,4 +129,7 @@ data class PermissionInfo(
     override fun getLimitType(): LimitType = LimitType.PERMISSION
 
     override fun checkLimit(p: Player): Boolean = p.hasPermission(permission)
+    override fun toString(): String {
+        return "权限限制: $permission"
+    }
 }

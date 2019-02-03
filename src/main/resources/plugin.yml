@@ -3,3 +3,10 @@ authors: ['Bryan_lzh']
 main: br.kt.welore.Main
 depend: [BrAPI,Vault,PlayerPoints]
 version: 1.0-SNAPSHOT
+
+commands:
+  WeLore:
+    aliases: [wl]
+    description: 主命令
+    usage: |
+      /<command> see >> 查看手持物品属性

@@ -12,8 +12,7 @@ class DefenceAttribute : Attribute<AttributeInfo>(
 ) {
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
-        lore = ChatColor.stripColor(lore)
-        if (lore.matches("[^防御]*防御( )*[+-][0-9.]*]".toRegex())) {
+        if (lore.matches("[^防御]*防御( )*[+-][0-9.]*]点?".toRegex())) {
             lore = lore.replace("[^0-9.+-]".toRegex(), "")
             try {
                 return AttributeInfo(this, lore.toDouble())

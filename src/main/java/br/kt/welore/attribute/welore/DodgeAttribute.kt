@@ -12,7 +12,7 @@ object DodgeAttribute : Attribute<AttributeInfo>(
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
         lore = ChatColor.stripColor(lore)
-        if (lore.matches(".*几率[0-9.]*%]伤害赦免.*".toRegex())) {
+        if (lore.matches("[^几率]*几率[0-9.]*%伤害赦免[^伤害赦免]*".toRegex())) {
             lore = lore.replace("[^0-9.]".toRegex(), "")
             try {
                 return AttributeInfo(this, lore.toDouble() / 100.0)

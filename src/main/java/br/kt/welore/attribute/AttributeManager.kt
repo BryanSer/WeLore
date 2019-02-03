@@ -3,6 +3,7 @@ package br.kt.welore.attribute
 import Br.API.Utils
 import br.kt.welore.Main
 import br.kt.welore.attribute.welore.*
+import com.bekvon.bukkit.residence.Residence
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -48,7 +49,7 @@ object AttributeManager : Listener {
 
     val sortedAttribute: MutableList<Attribute<out AttributeInfo>> = ArrayList()
 
-    var experimentalCache: Boolean = true//实验性属性缓存功能
+    var experimentalCache: Boolean = false//实验性属性缓存功能
     private val attributeCache: MutableMap<String, WeakReference<AttributeInfo>?> = WeakHashMap()
 
     fun getAttribute(e: AttributeEntity): AttributeData {
@@ -130,6 +131,12 @@ object AttributeManager : Listener {
         if (evt.entity !is LivingEntity)
             return
         val entity: LivingEntity = evt.entity as LivingEntity
+        if (damager is Player && entity is Player) {
+            val res = Residence.getResidenceManager().getByLoc(damager.location)
+            if (res != null) {
+                return
+            }
+        }
         val data = AttributeDamageApplyData(getAttribute(entity), getAttribute(damager))
         data.data["$NAMESPACE_EVENT.$EVENT_DAMAGE"] = evt.damage  //记录伤害
         data.data["$NAMESPACE_EVENT.$EVENT_DAMAGECAUSE"] = evt.cause // 记录原因
@@ -147,7 +154,7 @@ object AttributeManager : Listener {
         finaldamage *= (1.0 + (data["DamageBoostAttribute.Rate"] as? Double ?: 0.0))
         evt.damage = finaldamage
         val refdmg = data["ReflectionAttribute.RefDamage"] as? Double
-        if (refdmg != null) {
+        if (refdmg != null && refdmg > 0.01) {
             damager.damage(refdmg)
         }
     }
@@ -264,6 +271,43 @@ object AttributeManager : Listener {
     }
 
     @JvmStatic
+    fun readAttribute(item: ItemStack, p: Player? = null): List<AttributeInfo> {
+
+        if (!item.hasItemMeta() || !item.itemMeta.hasLore()) {
+            return listOf()
+        }
+        val data: MutableMap<Attribute<AttributeInfo>, AttributeInfo> = HashMap()
+        for (lore in item.itemMeta.lore) {
+            val readAttribute = readAttribute(lore)
+            if (readAttribute != null) {
+                if (!readAttribute.attribute.isApplicable(item)) {
+                    continue
+                }
+                if (data.containsKey(readAttribute.attribute)) {
+                    readAttribute.attribute.infoAddFunction(data[readAttribute.attribute]!!, readAttribute)
+                } else {
+                    data[readAttribute.attribute] = readAttribute
+                }
+            }
+        }
+        if (p != null)
+            for (v in data.values) {
+                if (!v.checkLimit(p)) {
+                    return listOf()
+                }
+            }
+        val result = HashMap<String, AttributeInfo>()
+        for ((attr, value) in data) {
+            if (result.containsKey(attr.name)) {
+                attr.infoAddFunction(result[attr.name]!!, value)
+            } else {
+                result[attr.name] = value
+            }
+        }
+        return result.values.toList()
+    }
+
+    @JvmStatic
     fun readAttribute(attr: String): AttributeInfo? {
         val lore = attr.replace(Regex("§."), "")
         var result: AttributeInfo? = null
@@ -275,7 +319,7 @@ object AttributeManager : Listener {
         }
         if (result == null) {
             for (a in sortedAttribute) {
-                result = a.readAttribute(lore) as AttributeInfo?
+                result = a.readAttribute(lore)
                 if (result != null) {
                     break
                 }
@@ -286,4 +330,30 @@ object AttributeManager : Listener {
         }
         return result
     }
+
+
+}
+
+fun main() {
+    println(readAttribute("§a几率10%伤害+8").toString())
+}
+
+fun readAttribute(attr: String): AttributeInfo? {
+    val lore = attr.replace(Regex("§."), "")
+    var result: AttributeInfo? = null
+    if (result == null) {
+        val list = setOf(
+                DamageAttribute(),
+                DamagePercentAttribute(),
+                DefenceAttribute(),
+                DamageBoostAttribute
+        )
+        for (a in list) {
+            result = a.readAttribute(lore)
+            if (result != null) {
+                break
+            }
+        }
+    }
+    return result
 }

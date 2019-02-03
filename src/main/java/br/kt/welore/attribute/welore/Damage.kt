@@ -15,8 +15,7 @@ class DamageAttribute : Attribute<AttributeInfo>(
 
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
-        lore = ChatColor.stripColor(lore)
-        if (lore.matches("[^伤害]*伤害( )*[+-][0-9.]*]".toRegex())) {
+        if (lore.matches("[^伤害]*伤害[+-][0-9.]*点?".toRegex())) {
             lore = lore.replace("[^0-9.%+-]".toRegex(), "")
             if (lore.contains("%")) {
                 return null
@@ -58,8 +57,7 @@ class DamagePercentAttribute : Attribute<AttributeInfo>(
 
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
-        lore = ChatColor.stripColor(lore)
-        if (lore.matches("[^伤害]*伤害( )*[+-][0-9.%]*]".toRegex())) {
+        if (lore.matches("伤害[+-][0-9.]*%".toRegex())) {
             lore = lore.replace("[^0-9.%+-]".toRegex(), "")
             if (!lore.contains("%")) {
                 return null
@@ -83,7 +81,7 @@ object ArmorPenetrationAttribute : Attribute<AttributeInfo>(
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
         lore = ChatColor.stripColor(lore)
-        if (lore.matches("[^护甲穿透]*护甲穿透( )*[+-][0-9.]*]".toRegex())) {
+        if (lore.matches("[^护甲穿透]*护甲穿透( )*[+-][0-9.]*点?".toRegex())) {
             lore = lore.replace("[^0-9.%+-]".toRegex(), "")
             if (lore.contains("%")) {
                 return null
@@ -110,7 +108,7 @@ object ArmorPenetrationPercentAttribute : Attribute<AttributeInfo>(
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
         lore = ChatColor.stripColor(lore)
-        if (lore.matches("[^护甲穿透]*护甲穿透( )*[+-][0-9.%]*]".toRegex())) {
+        if (lore.matches("[^护甲穿透]*护甲穿透( )*[+-][0-9.%]*".toRegex())) {
             lore = lore.replace("[^0-9.%+-]".toRegex(), "")
             if (!lore.contains("%")) {
                 return null
@@ -141,9 +139,8 @@ object DamageBoostAttribute : Attribute<DamageBoostInfo>(
         info.boostData.addAll(other.boostData)
     }
 
-    private val regex = Pattern.compile("[^几率]*(几率(?<X>[0-9.%]*))伤害(?<Y>[+-][0-9.%]*)")
+    private val regex = Pattern.compile("[^几率]*(几率(?<X>[0-9.%]*))伤害(?<Y>[+-][0-9.%]*)点?")
     override fun readAttribute(lore: String): DamageBoostInfo? {
-        val lore = ChatColor.stripColor(lore)
         val entire = regex.matcher(lore)
         if (entire.matches()) {
             var x = 1.0
@@ -191,11 +188,20 @@ object DamageBoostAttribute : Attribute<DamageBoostInfo>(
 
 data class DamageBoostInfo(
         val boostData: MutableList<BoostData>
-) : AttributeInfo(DamageBoostAttribute, 0.0)
+) : AttributeInfo(DamageBoostAttribute, 0.0) {
+    override fun toString(): String {
+        return boostData.map(BoostData::toString).toString()
+    }
+}
 
 data class BoostData(
         val chance: Double,
         val value: Double,
         val isRate: Boolean
-)
+) {
+    override fun toString(): String =
+            if (isRate) "概率: $chance  增幅: $value%"
+            else "概率: $chance  增幅: $value"
+
+}
 

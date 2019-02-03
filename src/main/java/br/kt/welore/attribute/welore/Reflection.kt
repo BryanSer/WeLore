@@ -17,7 +17,7 @@ object ReflectionAttribute : Attribute<ReflectionInfo>(
         info.refData.addAll(other.refData)
     }
 
-    private val regex = Pattern.compile("[^几率]*(几率(?<X>[0-9.%]*))?反弹(?<Y>[0-9.%]*)")
+    private val regex = Pattern.compile("[^几率]*(几率(?<X>[0-9.%]*))?反弹(?<Y>[0-9.%]*)[^反弹]*")
     override fun readAttribute(lore: String): ReflectionInfo? {
         val lore = ChatColor.stripColor(lore)
         val entire = regex.matcher(lore)
@@ -61,15 +61,25 @@ object ReflectionAttribute : Attribute<ReflectionInfo>(
         }
         data.set("ReflectionAttribute.RefDamage", refdmg)
     }
+
+
 }
 
 data class ReflectionInfo(
         val refData: MutableList<RefData>
-) : AttributeInfo(ReflectionAttribute, 0.0)
+) : AttributeInfo(ReflectionAttribute, 0.0) {
+    override fun toString(): String {
+        return refData.map(RefData::toString).toString()
+    }
+}
 
 data class RefData(
         val chance: Double,
         val value: Double,
         val isRate: Boolean
-)
+) {
+    override fun toString(): String =
+            if (isRate) "概率: $chance  反弹: $isRate%"
+            else "概率: $chance  反弹: $isRate"
+}
 

@@ -39,4 +39,9 @@ public class AttributeInfo {
     public double getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return this.attribute.getDisplayName() + ":  " + this.value;
+    }
 }

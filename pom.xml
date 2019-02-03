@@ -27,7 +27,7 @@
             <artifactId>PlayerPoints</artifactId>
             <version>2.1.3</version>
             <scope>system</scope>
-            <systemPath>${brapi.path}/PlayerPoints2.1.3.jar</systemPath>
+            <systemPath>${brapi.path}/libs/PlayerPoints2.1.3.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
@@ -58,7 +58,14 @@
             <artifactId>BrAPI</artifactId>
             <version>Release-3.4.7</version>
             <scope>system</scope>
-            <systemPath>${brapi.path}/BrAPI.jar</systemPath>
+            <systemPath>${brapi.path}/libs/BrAPI.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>residence</groupId>
+            <artifactId>residence</artifactId>
+            <version>2.11.0.0</version>
+            <scope>system</scope>
+            <systemPath>${brapi.path}/libs/Residence.jar</systemPath>
         </dependency>
     </dependencies>
     <build>
