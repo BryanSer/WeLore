@@ -48,8 +48,7 @@ object AttributeManager : Listener {
     val playerAttributeCache: MutableMap<Int, AttributeData> = HashMap()
 
     val sortedAttribute: MutableList<Attribute<out AttributeInfo>> = ArrayList()
-
-    var experimentalCache: Boolean = false//实验性属性缓存功能
+    var experimentalCache: Boolean = true//实验性属性缓存功能
     private val attributeCache: MutableMap<String, WeakReference<AttributeInfo>?> = WeakHashMap()
 
     fun getAttribute(e: AttributeEntity): AttributeData {

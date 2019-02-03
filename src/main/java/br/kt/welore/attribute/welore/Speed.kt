@@ -13,7 +13,7 @@ object MoveSpeedAttribute : Attribute<AttributeInfo>(
         interval = 5
 ) {
 
-    private val regex = Pattern.compile("[^移速]*移速(?<value>[+-][0-9.]*)%]")!!
+    private val regex = Pattern.compile("[^移速]*移速(?<value>[+-][0-9.]*)%")!!
     override fun readAttribute(lore: String): AttributeInfo? {
         val lore = ChatColor.stripColor(lore)
         val matcher = regex.matcher(lore)

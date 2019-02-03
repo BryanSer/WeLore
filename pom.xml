@@ -10,7 +10,7 @@
     </properties>
     <groupId>br.bukkit</groupId>
     <artifactId>WeLore</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-experimentalCache</version>
     <repositories>
         <repository>
             <id>spigot-repo</id>
