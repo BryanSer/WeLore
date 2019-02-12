@@ -8,6 +8,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import java.util.regex.Pattern
 
@@ -23,13 +24,16 @@ class DamageAttribute : Attribute<AttributeInfo>(
 
     @EventHandler
     fun onFinalDamage(evt: AttributeFinalDamageEvent) {
+        if (evt.event !is EntityDamageByEntityEvent) {
+            return
+        }
         var finaldamage = evt.data["${AttributeManager.NAMESPACE_EVENT}.${AttributeManager.EVENT_DAMAGE}"] as Double
         finaldamage += evt.data["DamageBoostAttribute.Value"] as? Double ?: 0.0
         finaldamage *= (1.0 + (evt.data["DamageBoostAttribute.Rate"] as? Double ?: 0.0))
         evt.event.damage = finaldamage
         val refdmg = evt.data["ReflectionAttribute.RefDamage"] as? Double
         if (refdmg != null && refdmg > 0.01) {
-            evt.damager.damage(refdmg)
+            evt.damager?.damage(refdmg)
         }
     }
 

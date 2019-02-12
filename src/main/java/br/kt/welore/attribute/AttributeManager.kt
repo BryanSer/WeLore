@@ -37,7 +37,7 @@ class AttributeLoadEvent(p: Entity, val data: AttributeData) : EntityEvent(p) {
 
 class AttributeFinalDamageEvent(
         val entity: LivingEntity,
-        val damager: LivingEntity,
+        val damager: LivingEntity?,
         val event: EntityDamageEvent,
         val data: AttributeApplyData
 ) : Event(), Cancellable {
@@ -198,6 +198,11 @@ object AttributeManager : Listener {
             if (attr.type.contains(AttributeType.DEFENCE)) {
                 attr.apply(entity, data.entity(attr) ?: continue, data)
             }
+        }
+        val afdevt = AttributeFinalDamageEvent(entity, null, evt, data)
+        Bukkit.getPluginManager().callEvent(afdevt)
+        if (afdevt.cancel) {
+            evt.isCancelled = true
         }
     }
 
