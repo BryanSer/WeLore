@@ -9,9 +9,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
-import org.bukkit.event.EventHandler
-import org.bukkit.event.HandlerList
-import org.bukkit.event.Listener
+import org.bukkit.event.*
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
@@ -35,6 +33,34 @@ class AttributeLoadEvent(p: Entity, val data: AttributeData) : EntityEvent(p) {
         return handler
     }
 
+}
+
+class AttributeFinalDamageEvent(
+        val entity: LivingEntity,
+        val damager: LivingEntity,
+        val event: EntityDamageEvent,
+        val data: AttributeApplyData
+) : Event(), Cancellable {
+
+    var cancel = false
+    override fun setCancelled(cancel: Boolean) {
+        this.cancel = cancel
+    }
+
+    override fun isCancelled(): Boolean = cancel
+
+    companion object {
+        val handler: HandlerList = HandlerList()
+
+        @JvmStatic
+        fun getHandlerList(): HandlerList {
+            return handler
+        }
+    }
+
+    override fun getHandlers(): HandlerList {
+        return handler
+    }
 }
 
 object AttributeManager : Listener {
@@ -151,13 +177,10 @@ object AttributeManager : Listener {
                 attr.apply(entity, data.entity(attr) ?: continue, data)
             }
         }
-        var finaldamage = data["$NAMESPACE_EVENT.$EVENT_DAMAGE"] as Double
-        finaldamage += data["DamageBoostAttribute.Value"] as? Double ?: 0.0
-        finaldamage *= (1.0 + (data["DamageBoostAttribute.Rate"] as? Double ?: 0.0))
-        evt.damage = finaldamage
-        val refdmg = data["ReflectionAttribute.RefDamage"] as? Double
-        if (refdmg != null && refdmg > 0.01) {
-            damager.damage(refdmg)
+        val afdevt = AttributeFinalDamageEvent(entity, damager, evt, data)
+        Bukkit.getPluginManager().callEvent(afdevt)
+        if (afdevt.cancel) {
+            evt.isCancelled = true
         }
     }
 

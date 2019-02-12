@@ -1,8 +1,13 @@
 package br.kt.welore.attribute.welore
 
+import br.kt.welore.Main
 import br.kt.welore.attribute.*
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.LivingEntity
+import org.bukkit.event.EventHandler
+import org.bukkit.event.HandlerList
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import java.util.regex.Pattern
 
@@ -11,7 +16,26 @@ class DamageAttribute : Attribute<AttributeInfo>(
         "伤害",
         10,
         AttributeType.ATTACK
-) {
+), Listener {
+    init {
+        Bukkit.getPluginManager().registerEvents(this, Main.getInstance())
+    }
+
+    @EventHandler
+    fun onFinalDamage(evt: AttributeFinalDamageEvent) {
+        var finaldamage = evt.data["${AttributeManager.NAMESPACE_EVENT}.${AttributeManager.EVENT_DAMAGE}"] as Double
+        finaldamage += evt.data["DamageBoostAttribute.Value"] as? Double ?: 0.0
+        finaldamage *= (1.0 + (evt.data["DamageBoostAttribute.Rate"] as? Double ?: 0.0))
+        evt.event.damage = finaldamage
+        val refdmg = evt.data["ReflectionAttribute.RefDamage"] as? Double
+        if (refdmg != null && refdmg > 0.01) {
+            evt.damager.damage(refdmg)
+        }
+    }
+
+    override fun onDisable() {
+        HandlerList.unregisterAll(this)
+    }
 
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
