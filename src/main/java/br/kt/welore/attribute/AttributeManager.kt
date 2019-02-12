@@ -41,6 +41,7 @@ object AttributeManager : Listener {
     val cacheTime: Long = 1000
     @JvmStatic
     val NAMESPACE_EVENT = "Event"
+    val EVENT = "Event"
     val EVENT_DAMAGE = "Damage"
     val EVENT_DAMAGECAUSE = "DamageCause"
 
@@ -107,6 +108,7 @@ object AttributeManager : Listener {
         }
         val evt = AttributeLoadEvent(e, result.copy())
         Bukkit.getPluginManager().callEvent(evt)
+        evt.data.putDefault()
         return evt.data
     }
 
@@ -137,6 +139,7 @@ object AttributeManager : Listener {
             }
         }
         val data = AttributeDamageApplyData(getAttribute(entity), getAttribute(damager))
+        data.data["$NAMESPACE_EVENT.$EVENT"] = evt
         data.data["$NAMESPACE_EVENT.$EVENT_DAMAGE"] = evt.damage  //记录伤害
         data.data["$NAMESPACE_EVENT.$EVENT_DAMAGECAUSE"] = evt.cause // 记录原因
         //call event
@@ -202,6 +205,32 @@ object AttributeManager : Listener {
         }
     }
 
+    @JvmStatic
+    public fun registerAttribute(attr: Attribute<out AttributeInfo>) {
+        registeredAttribute[attr.name] = attr
+        sortedAttribute.clear()
+        sortedAttribute.addAll(registeredAttribute.values)
+        sortedAttribute.sortBy {
+            it.priority
+        }
+    }
+
+    @JvmStatic
+    public fun unregisterAttribute(filler: (Attribute<out AttributeInfo>) -> Boolean) {
+        val it = registeredAttribute.values.iterator()
+        while (it.hasNext()) {
+            val next = it.next()
+            if (filler(next)) {
+                next.onDisable()
+                it.remove()
+            }
+        }
+        sortedAttribute.clear()
+        sortedAttribute.addAll(registeredAttribute.values)
+        sortedAttribute.sortBy {
+            it.priority
+        }
+    }
 
     @JvmStatic
     fun init() {
@@ -228,6 +257,7 @@ object AttributeManager : Listener {
             registeredAttribute[atr.name] = atr
         }
 
+
         sortedAttribute.addAll(registeredAttribute.values)
         sortedAttribute.sortBy {
             it.priority
@@ -248,7 +278,7 @@ object AttributeManager : Listener {
                 val active: MutableList<Attribute<out AttributeInfo>> = ArrayList()
                 for (attr in sortedAttribute) {
                     if (attr.type.contains(AttributeType.PASSIVE)) {
-                        var t = lastCall[attr.name] ?: 0 + 1
+                        var t = (lastCall[attr.name] ?: 0) + 1
                         if (t >= attr.interval) {
                             active.add(attr)
                             t = 0
@@ -333,9 +363,6 @@ object AttributeManager : Listener {
 
 }
 
-fun main() {
-    println(readAttribute("§a几率10%伤害+8").toString())
-}
 
 fun readAttribute(attr: String): AttributeInfo? {
     val lore = attr.replace(Regex("§."), "")

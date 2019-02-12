@@ -7,6 +7,7 @@ import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerExpChangeEvent
 import java.util.regex.Pattern
@@ -24,6 +25,10 @@ object ExpAttribute : Attribute<AttributeInfo>(
 
     val regex = Pattern.compile("[^经验]*经验(?<value>[+-][0-9.]*)%")
     val data = HashMap<String, Double>()
+
+    override fun onDisable() {
+        HandlerList.unregisterAll(this)
+    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onExp(evt: PlayerExpChangeEvent) {

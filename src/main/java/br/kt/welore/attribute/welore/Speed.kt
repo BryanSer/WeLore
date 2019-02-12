@@ -12,6 +12,10 @@ object MoveSpeedAttribute : Attribute<AttributeInfo>(
         AttributeType.PASSIVE,
         interval = 5
 ) {
+    init {
+        super.defaultInfo = AttributeInfo(this, 0.0)
+    }
+
 
     private val regex = Pattern.compile("[^移速]*移速(?<value>[+-][0-9.]*)%")!!
     override fun readAttribute(lore: String): AttributeInfo? {
@@ -26,9 +30,14 @@ object MoveSpeedAttribute : Attribute<AttributeInfo>(
         return null
     }
 
+
     override fun applyAttribute(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData) {
         if (p is Player) {
-            p.walkSpeed = (0.2 * (value.value + 1)).toFloat()
+            var speed = (0.2 * (value.value + 1.0)).toFloat()
+            if (speed > 1.0) {
+                speed = 1f
+            }
+            p.walkSpeed = speed
         }
     }
 

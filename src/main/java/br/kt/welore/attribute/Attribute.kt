@@ -13,8 +13,11 @@ abstract class Attribute<out T : AttributeInfo>(
         val displayName: String,
         val priority: Int,
         vararg val type: AttributeType,
-        val interval: Int = 5//默认重复间隔 作为PASSIVE时
+        val interval: Int = 5,//默认重复间隔 作为PASSIVE时
+        var defaultInfo: AttributeInfo? = null
 ) {
+
+    open fun onDisable() {}
 
     open fun isApplicable(item: ItemStack): Boolean = true
 
@@ -84,7 +87,16 @@ data class AttributeData(
         val holder: AttributeEntity,
         val cacheTime: Long,
         val data: MutableMap<String, AttributeInfo> = HashMap()
-)
+) {
+    fun putDefault() {
+        for (attr in AttributeManager.registeredAttribute.values) {
+            val di = attr.defaultInfo
+            if (di != null && !data.containsKey(attr.name)) {
+                data[attr.name] = di.copy()
+            }
+        }
+    }
+}
 
 
 interface Limit {

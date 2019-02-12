@@ -44,4 +44,9 @@ public class AttributeInfo {
     public String toString() {
         return this.attribute.getDisplayName() + ":  " + this.value;
     }
+
+
+    public AttributeInfo copy() {
+        return new AttributeInfo(this.attribute, this.value);
+    }
 }
