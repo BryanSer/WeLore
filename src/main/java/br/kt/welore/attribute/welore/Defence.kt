@@ -8,7 +8,7 @@ class DefenceAttribute : Attribute<AttributeInfo>(
         "Defence",
         "防御",
         20,
-        AttributeType.DEFENCE
+        arrayOf(AttributeType.DEFENCE)
 ) {
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
@@ -48,7 +48,7 @@ class ResistanceAttribute : Attribute<AttributeInfo>(
         "Resistance",
         "抗性",
         19,
-        AttributeType.DEFENCE
+        arrayOf(AttributeType.DEFENCE)
 ) {
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore

@@ -9,7 +9,7 @@ object MoveSpeedAttribute : Attribute<AttributeInfo>(
         "MoveSpeed",
         "移速",
         1,
-        AttributeType.PASSIVE,
+        arrayOf(AttributeType.PASSIVE),
         interval = 5
 ) {
     init {

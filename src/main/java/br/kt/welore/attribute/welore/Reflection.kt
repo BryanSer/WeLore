@@ -8,7 +8,7 @@ object ReflectionAttribute : Attribute<ReflectionInfo>(
         "Reflection",
         "反弹",
         25,
-        AttributeType.DEFENCE
+        arrayOf(AttributeType.DEFENCE)
 ) {
 
     override fun infoAddFunction(info: AttributeInfo, other: AttributeInfo) {

@@ -11,7 +11,7 @@ object PointLimit : Attribute<AttributeInfo>(
         "PointLimit",
         "点卷限制",
         1,
-        AttributeType.ATTRIBUTE
+        arrayOf(AttributeType.ATTRIBUTE)
 ) {
     val API = PlayerPoints.getPlugin(PlayerPoints::class.java).api
     val regex = Pattern.compile("[^点卷限制]*点卷限制(?<value>[0-9]*)点.*")
@@ -44,7 +44,7 @@ object LevelLimit : Attribute<AttributeInfo>(
         "LevelLimit",
         "等级限制",
         1,
-        AttributeType.ATTRIBUTE
+        arrayOf(AttributeType.ATTRIBUTE)
 ) {
     val regex = Pattern.compile("[^等级限制]*等级限制(?<value>[0-9]*)级.*")
     override fun readAttribute(lore: String): AttributeInfo? {
@@ -74,7 +74,7 @@ object MoneyLimit : Attribute<AttributeInfo>(
         "MoneyLimit",
         "金钱限制",
         1,
-        AttributeType.ATTRIBUTE
+        arrayOf(AttributeType.ATTRIBUTE)
 ) {
     val regex = Pattern.compile("[^金钱限制]*金钱限制(?<value>[0-9.]*)金币.*")
     override fun readAttribute(lore: String): AttributeInfo? {
@@ -104,7 +104,7 @@ object PermissionLimit : Attribute<PermissionInfo>(
         "PermissionLimit",
         "权限限制",
         1,
-        AttributeType.ATTRIBUTE
+        arrayOf(AttributeType.ATTRIBUTE)
 ) {
     override fun readAttribute(lore: String): PermissionInfo? {
         val lore = ChatColor.stripColor(lore)

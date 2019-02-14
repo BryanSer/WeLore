@@ -16,7 +16,7 @@ object ExpAttribute : Attribute<AttributeInfo>(
         "Exp",
         "经验",
         1,
-        AttributeType.PASSIVE,
+        arrayOf(AttributeType.PASSIVE),
         interval = 5
 ), Listener {
     init {

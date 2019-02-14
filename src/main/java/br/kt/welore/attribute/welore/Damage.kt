@@ -16,7 +16,7 @@ class DamageAttribute : Attribute<AttributeInfo>(
         "Damage",
         "伤害",
         10,
-        AttributeType.ATTACK
+        arrayOf(AttributeType.ATTACK)
 ), Listener {
     init {
         Bukkit.getPluginManager().registerEvents(this, Main.getInstance())
@@ -71,7 +71,7 @@ class DamagePercentAttribute : Attribute<AttributeInfo>(
         "DamagePercent",
         "伤害",
         11,
-        AttributeType.ATTACK
+        arrayOf(AttributeType.ATTACK)
 ) {
     override fun applyAttribute(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData) {
         val cause = data.data(AttributeManager.NAMESPACE_EVENT, AttributeManager.EVENT_DAMAGECAUSE) as EntityDamageEvent.DamageCause
@@ -104,7 +104,7 @@ object ArmorPenetrationAttribute : Attribute<AttributeInfo>(
         "ArmorPenetration",
         "护甲穿透",
         19,
-        AttributeType.ATTACK
+        arrayOf(AttributeType.ATTACK)
 ) {
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
@@ -131,7 +131,7 @@ object ArmorPenetrationPercentAttribute : Attribute<AttributeInfo>(
         "ArmorPenetrationPercent",
         "护甲穿透",
         19,
-        AttributeType.ATTACK
+        arrayOf(AttributeType.ATTACK)
 ) {
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
@@ -159,7 +159,7 @@ object DamageBoostAttribute : Attribute<DamageBoostInfo>(
         "DamageBoost",
         "伤害提升",
         5,
-        AttributeType.ATTACK
+        arrayOf(AttributeType.ATTACK)
 ) {
     override fun infoAddFunction(info: AttributeInfo, other: AttributeInfo) {
         val info = info as DamageBoostInfo

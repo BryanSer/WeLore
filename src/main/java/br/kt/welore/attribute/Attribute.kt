@@ -12,7 +12,7 @@ abstract class Attribute<out T : AttributeInfo>(
         val name: String,
         val displayName: String,
         val priority: Int,
-        vararg val type: AttributeType,
+        val type: Array<AttributeType>,
         val interval: Int = 5,//默认重复间隔 作为PASSIVE时
         var defaultInfo: AttributeInfo? = null
 ) {
@@ -51,7 +51,7 @@ open class AttributeApplyData(
         return data["$namespace.$key"]
     }
 
-    fun set(path: String, value: Any?) {
+    operator fun set(path: String, value: Any?) {
         data[path] = value
     }
 

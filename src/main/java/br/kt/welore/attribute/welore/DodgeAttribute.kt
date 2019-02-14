@@ -7,7 +7,7 @@ object DodgeAttribute : Attribute<AttributeInfo>(
         "Dodge",
         "伤害赦免",
         5,
-        AttributeType.DEFENCE
+        arrayOf(AttributeType.DEFENCE)
 ) {
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
