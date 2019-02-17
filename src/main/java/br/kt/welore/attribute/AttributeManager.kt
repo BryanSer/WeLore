@@ -70,6 +70,7 @@ object AttributeManager : Listener {
     val EVENT = "Event"
     val EVENT_DAMAGE = "Damage"
     val EVENT_DAMAGECAUSE = "DamageCause"
+    var DEBUG: Boolean = true
 
     val registeredAttribute: MutableMap<String, Attribute<out AttributeInfo>> = HashMap()
     val playerAttributeCache: MutableMap<Int, AttributeData> = HashMap()
@@ -376,9 +377,15 @@ object AttributeManager : Listener {
         }
         if (result == null) {
             for (a in sortedAttribute) {
-                result = a.readAttribute(lore)
-                if (result != null) {
-                    break
+                try {
+                    result = a.readAttribute(lore)
+                    if (result != null) {
+                        break
+                    }
+                } catch (e: Throwable) {
+                    if (DEBUG) {
+                        e.printStackTrace()
+                    }
                 }
             }
         }

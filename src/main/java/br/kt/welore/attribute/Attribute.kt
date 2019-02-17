@@ -27,12 +27,20 @@ abstract class Attribute<out T : AttributeInfo>(
 
     abstract fun readAttribute(lore: String): T?
 
-    open fun apply(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData) {
-        if (data.jumpApply) {
+    fun apply(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData) {
+        if (data.skipApply && isSkipable()) {
             return
         }
-        this.applyAttribute(p, value, data)
+        try {
+            this.applyAttribute(p, value, data)
+        } catch (e: Throwable) {
+            if (AttributeManager.DEBUG) {
+                e.printStackTrace()
+            }
+        }
     }
+
+    open fun isSkipable(): Boolean = true
 
     abstract fun applyAttribute(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData)
 }
@@ -41,7 +49,7 @@ open class AttributeApplyData(
         val entityAttribute: AttributeData,
         val data: MutableMap<String, Any?> = HashMap(),
         var cancel: Boolean = false,
-        var jumpApply: Boolean = false
+        var skipApply: Boolean = false
 ) {
     operator fun get(path: String): Any? {
         return data[path]

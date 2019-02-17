@@ -25,7 +25,7 @@ object DodgeAttribute : Attribute<AttributeInfo>(
     override fun applyAttribute(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData) {
         if (Math.random() < value.value) {
             data.cancel = true
-            data.jumpApply = true
+            data.skipApply = true
         }
     }
 }
