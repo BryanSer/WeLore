@@ -169,6 +169,8 @@ object AttributeManager : Listener {
         data.data["$NAMESPACE_EVENT.$EVENT"] = evt
         data.data["$NAMESPACE_EVENT.$EVENT_DAMAGE"] = evt.damage  //记录伤害
         data.data["$NAMESPACE_EVENT.$EVENT_DAMAGECAUSE"] = evt.cause // 记录原因
+        data["$NAMESPACE_EVENT.Entity"] = entity
+        data["$NAMESPACE_EVENT.Damager"] = damager
         //call event
         for (attr in sortedAttribute) {
             if (attr.type.contains(AttributeType.ATTACK)) {
@@ -192,8 +194,9 @@ object AttributeManager : Listener {
             return
         val entity: LivingEntity = evt.entity as LivingEntity
         val data = AttributeApplyData(getAttribute(entity))
-        data.data["$NAMESPACE_EVENT.$EVENT_DAMAGE"] = evt.damage  //记录伤害
-        data.data["$NAMESPACE_EVENT.$EVENT_DAMAGECAUSE"] = evt.cause // 记录原因
+        data["$NAMESPACE_EVENT.$EVENT_DAMAGE"] = evt.damage  //记录伤害
+        data["$NAMESPACE_EVENT.$EVENT_DAMAGECAUSE"] = evt.cause // 记录原因
+        data["$NAMESPACE_EVENT.Entity"] = entity
         //call event
         for (attr in sortedAttribute) {
             if (attr.type.contains(AttributeType.DEFENCE)) {
@@ -264,26 +267,29 @@ object AttributeManager : Listener {
     @JvmStatic
     fun init() {
         Bukkit.getPluginManager().registerEvents(this, Main.getInstance())
-        val list = setOf(
-                DamageAttribute(),
-                DamagePercentAttribute(),
-                DefenceAttribute(),
-                ResistanceAttribute(),
-                ArmorPenetrationAttribute,
-                ArmorPenetrationPercentAttribute,
-                DodgeAttribute,
-                ReflectionAttribute,
-                DamageBoostAttribute,
-                MoveSpeedAttribute,
-                PermissionLimit,
-                LevelLimit,
-                MoneyLimit,
-                PointLimit,
-                ExpAttribute
-        )
+        try {
+            val list = setOf(
+                    DamageAttribute(),
+                    DamagePercentAttribute(),
+                    DefenceAttribute(),
+                    ResistanceAttribute(),
+                    ArmorPenetrationAttribute,
+                    ArmorPenetrationPercentAttribute,
+                    DodgeAttribute,
+                    ReflectionAttribute,
+                    DamageBoostAttribute,
+                    MoveSpeedAttribute,
+                    PermissionLimit,
+                    LevelLimit,
+                    MoneyLimit,
+                    PointLimit,
+                    ExpAttribute
+            )
 
-        for (atr in list) {
-            registeredAttribute[atr.name] = atr
+            for (atr in list) {
+                registeredAttribute[atr.name] = atr
+            }
+        } catch (e: Throwable) {
         }
 
 

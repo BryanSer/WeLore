@@ -1,7 +1,8 @@
 name: WeLore
 authors: ['Bryan_lzh']
 main: br.kt.welore.Main
-depend: [BrAPI,Vault,PlayerPoints]
+depend: [BrAPI]
+softdepend: [PlayerPoints,Vault]
 version: 1.0-SNAPSHOT
 
 commands:
