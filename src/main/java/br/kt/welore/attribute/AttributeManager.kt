@@ -182,7 +182,7 @@ object AttributeManager : Listener {
         }
         val afdevt = AttributeFinalDamageEvent(entity, damager, evt, data)
         Bukkit.getPluginManager().callEvent(afdevt)
-        if (afdevt.cancel) {
+        if (afdevt.cancel || data.cancel) {
             evt.isCancelled = true
         }
     }
