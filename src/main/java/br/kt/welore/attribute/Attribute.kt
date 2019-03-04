@@ -100,7 +100,7 @@ data class AttributeData(
         for (attr in AttributeManager.registeredAttribute.values) {
             val di = attr.defaultInfo
             if (di != null && !data.containsKey(attr.name)) {
-                data[attr.name] = di.copy()
+                data[attr.name] = di.clone()
             }
         }
     }

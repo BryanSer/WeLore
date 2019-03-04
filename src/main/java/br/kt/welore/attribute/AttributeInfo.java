@@ -3,7 +3,7 @@ package br.kt.welore.attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class AttributeInfo {
+public class AttributeInfo implements Cloneable {
     Attribute<AttributeInfo> attribute;
     double value;
 
@@ -46,7 +46,17 @@ public class AttributeInfo {
     }
 
 
-    public AttributeInfo copy() {
-        return new AttributeInfo(this.attribute, this.value);
+    //public AttributeInfo copy() {
+    //    return new AttributeInfo(this.attribute, this.value);
+    //}
+
+    @Override
+    protected AttributeInfo clone() {
+        try {
+            return (AttributeInfo) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

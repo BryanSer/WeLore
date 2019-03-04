@@ -93,6 +93,7 @@ object AttributeManager : Listener {
             playerAttributeCache.remove(e.entityId)
         }
         result = AttributeData(e, System.currentTimeMillis())
+        result.putDefault()
         val items: MutableList<ItemStack> = ArrayList()
         for (item in e.equipment.armorContents) {
             items.add(item)
@@ -111,7 +112,7 @@ object AttributeManager : Listener {
                         continue
                     }
                     if (data.containsKey(readAttribute.attribute)) {
-                        readAttribute.attribute.infoAddFunction(data[readAttribute.attribute]!!, readAttribute)
+                        readAttribute.attribute.infoAddFunction(data[readAttribute.attribute]!!.clone(), readAttribute)
                     } else {
                         data[readAttribute.attribute] = readAttribute
                     }
@@ -135,7 +136,6 @@ object AttributeManager : Listener {
         }
         val evt = AttributeLoadEvent(e, result.copy())
         Bukkit.getPluginManager().callEvent(evt)
-        evt.data.putDefault()
         return evt.data
     }
 
