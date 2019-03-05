@@ -66,10 +66,16 @@ object ReflectionAttribute : Attribute<ReflectionInfo>(
 }
 
 data class ReflectionInfo(
-        val refData: MutableList<RefData>
-) : AttributeInfo(ReflectionAttribute, 0.0) {
+        var refData: MutableList<RefData>
+) : AttributeInfo(ReflectionAttribute, 0.0), Cloneable {
     override fun toString(): String {
         return refData.map(RefData::toString).toString()
+    }
+
+    override fun clone(): AttributeInfo {
+        val d = this.copy()
+        d.refData = ArrayList(refData)
+        return d
     }
 }
 
@@ -77,9 +83,13 @@ data class RefData(
         val chance: Double,
         val value: Double,
         val isRate: Boolean
-) {
+) : Cloneable {
     override fun toString(): String =
             if (isRate) "概率: $chance  反弹: $isRate%"
             else "概率: $chance  反弹: $isRate"
+
+    override fun clone(): RefData {
+        return this.copy()
+    }
 }
 

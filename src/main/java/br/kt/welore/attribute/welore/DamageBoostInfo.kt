@@ -197,6 +197,7 @@ object DamageBoostAttribute : Attribute<DamageBoostInfo>(
 
     override fun applyAttribute(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData) {
         val value = value as DamageBoostInfo
+        val evt = data["${AttributeManager.NAMESPACE_EVENT}.${AttributeManager.EVENT}"] as EntityDamageByEntityEvent
         var dmgboost = 0.0
         var dmgboostr = 0.0
         for (dbi in value.boostData) {
@@ -208,17 +209,23 @@ object DamageBoostAttribute : Attribute<DamageBoostInfo>(
                 }
             }
         }
-        data.set("DamageBoostAttribute.Value", dmgboost)
-        data.set("DamageBoostAttribute.Rate", dmgboostr)
+        data["DamageBoostAttribute.Value"] = dmgboost
+        data["DamageBoostAttribute.Rate"] = dmgboostr
     }
 
 }
 
 data class DamageBoostInfo(
-        val boostData: MutableList<BoostData>
-) : AttributeInfo(DamageBoostAttribute, 0.0) {
+        var boostData: MutableList<BoostData>
+) : AttributeInfo(DamageBoostAttribute, 0.0), Cloneable {
     override fun toString(): String {
         return boostData.map(BoostData::toString).toString()
+    }
+
+    override fun clone(): AttributeInfo {
+        val d = this.copy()
+        d.boostData = ArrayList(d.boostData)
+        return d
     }
 }
 
@@ -226,10 +233,14 @@ data class BoostData(
         val chance: Double,
         val value: Double,
         val isRate: Boolean
-) {
+) : Cloneable {
     override fun toString(): String =
             if (isRate) "概率: $chance  增幅: $value%"
             else "概率: $chance  增幅: $value"
+
+    override fun clone(): BoostData {
+        return this.copy()
+    }
 
 }
 

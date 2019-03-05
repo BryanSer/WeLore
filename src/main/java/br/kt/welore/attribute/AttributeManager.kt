@@ -5,63 +5,18 @@ import br.kt.welore.Main
 import br.kt.welore.attribute.welore.*
 import com.bekvon.bukkit.residence.Residence
 import org.bukkit.Bukkit
-import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
-import org.bukkit.event.*
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
-import org.bukkit.event.entity.EntityEvent
 import org.bukkit.inventory.ItemStack
 import java.lang.ref.WeakReference
 import java.util.*
 
-
-class AttributeLoadEvent(p: Entity, val data: AttributeData) : EntityEvent(p) {
-    companion object {
-        val handler: HandlerList = HandlerList()
-
-        @JvmStatic
-        fun getHandlerList(): HandlerList {
-            return handler
-        }
-    }
-
-    override fun getHandlers(): HandlerList {
-        return handler
-    }
-
-}
-
-class AttributeFinalDamageEvent(
-        val entity: LivingEntity,
-        val damager: LivingEntity?,
-        val event: EntityDamageEvent,
-        val data: AttributeApplyData
-) : Event(), Cancellable {
-
-    var cancel = false
-    override fun setCancelled(cancel: Boolean) {
-        this.cancel = cancel
-    }
-
-    override fun isCancelled(): Boolean = cancel
-
-    companion object {
-        val handler: HandlerList = HandlerList()
-
-        @JvmStatic
-        fun getHandlerList(): HandlerList {
-            return handler
-        }
-    }
-
-    override fun getHandlers(): HandlerList {
-        return handler
-    }
-}
 
 object AttributeManager : Listener {
     val cacheTime: Long = 1000
@@ -108,6 +63,7 @@ object AttributeManager : Listener {
             for (lore in item.itemMeta.lore) {
                 val readAttribute = readAttribute(lore)
                 if (readAttribute != null) {
+                    val readAttribute = readAttribute.clone()
                     if (!readAttribute.attribute.isApplicable(item)) {
                         continue
                     }
@@ -132,7 +88,7 @@ object AttributeManager : Listener {
             }
         }
         if (e is Player) {
-            playerAttributeCache[e.entityId] = result
+            playerAttributeCache[e.entityId] = result.copy()
         }
         val evt = AttributeLoadEvent(e, result.copy())
         Bukkit.getPluginManager().callEvent(evt)
@@ -224,7 +180,7 @@ object AttributeManager : Listener {
             if (get === null) {
                 attributeCache.remove(lore)
             }
-            return AttributeInfoCache(get, true)
+            return AttributeInfoCache(get!!, true)
         }
         return AttributeInfoCache(null, false)
     }
@@ -336,7 +292,6 @@ object AttributeManager : Listener {
 
     @JvmStatic
     fun readAttribute(item: ItemStack, p: Player? = null): List<AttributeInfo> {
-
         if (!item.hasItemMeta() || !item.itemMeta.hasLore()) {
             return listOf()
         }
@@ -347,6 +302,7 @@ object AttributeManager : Listener {
                 if (!readAttribute.attribute.isApplicable(item)) {
                     continue
                 }
+                val readAttribute = readAttribute.clone()
                 if (data.containsKey(readAttribute.attribute)) {
                     readAttribute.attribute.infoAddFunction(data[readAttribute.attribute]!!, readAttribute)
                 } else {
@@ -396,31 +352,10 @@ object AttributeManager : Listener {
             }
         }
         if (experimentalCache) {
-            putCache(lore, result)
+            putCache(lore, result?.clone())
         }
         return result
     }
 
 
-}
-
-
-fun readAttribute(attr: String): AttributeInfo? {
-    val lore = attr.replace(Regex("§."), "")
-    var result: AttributeInfo? = null
-    if (result == null) {
-        val list = setOf(
-                DamageAttribute(),
-                DamagePercentAttribute(),
-                DefenceAttribute(),
-                DamageBoostAttribute
-        )
-        for (a in list) {
-            result = a.readAttribute(lore)
-            if (result != null) {
-                break
-            }
-        }
-    }
-    return result
 }
