@@ -33,6 +33,7 @@
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
             <version>1.6</version>
+            <scope>provided</scope>
         </dependency>
         <!--Spigot API-->
         <dependency>
@@ -56,9 +57,8 @@
         <dependency>
             <groupId>br.bukkit</groupId>
             <artifactId>BrAPI</artifactId>
-            <version>Release-3.4.7</version>
-            <scope>system</scope>
-            <systemPath>${brapi.path}/libs/BrAPI.jar</systemPath>
+            <version>Release-3.5.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>residence</groupId>

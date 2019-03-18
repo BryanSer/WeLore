@@ -63,7 +63,7 @@ class DamageAttribute : Attribute<AttributeInfo>(
             return
         }
         val dmg = (data.data(AttributeManager.NAMESPACE_EVENT, AttributeManager.EVENT_DAMAGE) as Number).toDouble()
-        data.set("${AttributeManager.NAMESPACE_EVENT}.${AttributeManager.EVENT_DAMAGE}", dmg + value.value)
+        data["${AttributeManager.NAMESPACE_EVENT}.${AttributeManager.EVENT_DAMAGE}"] = dmg + value.value
     }
 }
 
@@ -197,7 +197,6 @@ object DamageBoostAttribute : Attribute<DamageBoostInfo>(
 
     override fun applyAttribute(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData) {
         val value = value as DamageBoostInfo
-        val evt = data["${AttributeManager.NAMESPACE_EVENT}.${AttributeManager.EVENT}"] as EntityDamageByEntityEvent
         var dmgboost = 0.0
         var dmgboostr = 0.0
         for (dbi in value.boostData) {

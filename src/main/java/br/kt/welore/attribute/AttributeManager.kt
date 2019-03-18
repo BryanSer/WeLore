@@ -68,7 +68,7 @@ object AttributeManager : Listener {
                         continue
                     }
                     if (data.containsKey(readAttribute.attribute)) {
-                        readAttribute.attribute.infoAddFunction(data[readAttribute.attribute]!!.clone(), readAttribute)
+                        readAttribute.attribute.infoAddFunction(data[readAttribute.attribute]!!, readAttribute)
                     } else {
                         data[readAttribute.attribute] = readAttribute
                     }
@@ -180,7 +180,7 @@ object AttributeManager : Listener {
             if (get === null) {
                 attributeCache.remove(lore)
             }
-            return AttributeInfoCache(get!!, true)
+            return AttributeInfoCache(get!!.clone(), true)
         }
         return AttributeInfoCache(null, false)
     }
@@ -299,10 +299,10 @@ object AttributeManager : Listener {
         for (lore in item.itemMeta.lore) {
             val readAttribute = readAttribute(lore)
             if (readAttribute != null) {
+                val readAttribute = readAttribute.clone()
                 if (!readAttribute.attribute.isApplicable(item)) {
                     continue
                 }
-                val readAttribute = readAttribute.clone()
                 if (data.containsKey(readAttribute.attribute)) {
                     readAttribute.attribute.infoAddFunction(data[readAttribute.attribute]!!, readAttribute)
                 } else {
