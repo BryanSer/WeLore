@@ -3,6 +3,7 @@ package br.kt.welore.attribute.welore
 import Br.API.Utils
 import br.kt.welore.attribute.*
 import org.black_ixx.playerpoints.PlayerPoints
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.regex.Pattern
@@ -13,7 +14,7 @@ object PointLimit : Attribute<AttributeInfo>(
         1,
         arrayOf(AttributeType.ATTRIBUTE)
 ) {
-    val API = PlayerPoints.getPlugin(PlayerPoints::class.java).api
+    val API = (Bukkit.getPluginManager().getPlugin("PlayerPoints") as? PlayerPoints)?.api
     val regex = Pattern.compile("[^点卷限制]*点卷限制(?<value>[0-9]*)点.*")
     override fun readAttribute(lore: String): AttributeInfo? {
         val lore = ChatColor.stripColor(lore)
@@ -26,8 +27,7 @@ object PointLimit : Attribute<AttributeInfo>(
                         group.toDouble()
                 ), Limit {
                     override fun getLimitType(): LimitType = LimitType.POINT
-                    override fun checkLimit(p: Player): Boolean = API.look(p.name) >= this.value
-
+                    override fun checkLimit(p: Player): Boolean = API?.look(p.name) ?: 0 >= this.value
                 }
             }
         }

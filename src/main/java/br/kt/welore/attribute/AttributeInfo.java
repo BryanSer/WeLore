@@ -4,11 +4,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class AttributeInfo implements Cloneable {
-    Attribute<AttributeInfo> attribute;
+    Attribute attribute;
     double value;
 
-    public AttributeInfo(Attribute<? extends AttributeInfo> attribute, double value) {
-        this.attribute = (Attribute<AttributeInfo>) attribute;
+    public AttributeInfo(Attribute attribute, double value) {
+        this.attribute = attribute;
         this.value = value;
     }
 

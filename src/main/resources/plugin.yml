@@ -2,7 +2,7 @@ name: WeLore
 authors: ['Bryan_lzh']
 main: br.kt.welore.Main
 depend: [BrAPI]
-softdepend: [PlayerPoints,Vault]
+softdepend: [PlayerPoints,Vault,PlaceholderAPI]
 version: 1.0-SNAPSHOT
 
 commands:
@@ -11,3 +11,4 @@ commands:
     description: 主命令
     usage: |
       /<command> see >> 查看手持物品属性
+          /<command> seeme >> 查看自身属性

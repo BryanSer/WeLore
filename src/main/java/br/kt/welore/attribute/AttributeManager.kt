@@ -178,9 +178,10 @@ object AttributeManager : Listener {
         if (wr != null) {
             val get = wr.get()
             if (get === null) {
-                attributeCache.remove(lore)
+                attributeCache -= lore
+                return AttributeInfoCache(null, false)
             }
-            return AttributeInfoCache(get!!.clone(), true)
+            return AttributeInfoCache(get.clone(), true)
         }
         return AttributeInfoCache(null, false)
     }
