@@ -109,7 +109,7 @@ object ArmorPenetrationAttribute : Attribute<AttributeInfo>(
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
         lore = ChatColor.stripColor(lore)
-        if (lore.matches("[^护甲穿透]*护甲穿透( )*[+-][0-9.]*点?".toRegex())) {
+        if (lore.matches("[^护甲穿透]*护甲穿透( )*[+-][0-9.]*点".toRegex())) {
             lore = lore.replace("[^0-9.%+-]".toRegex(), "")
             if (lore.contains("%")) {
                 return null
@@ -123,7 +123,7 @@ object ArmorPenetrationAttribute : Attribute<AttributeInfo>(
     }
 
     override fun applyAttribute(p: AttributeEntity, value: AttributeInfo, data: AttributeApplyData) {
-        data.set("ArmorPenetration.Value", value.value)
+        data["ArmorPenetration.Value"] = value.value
     }
 }
 
@@ -136,7 +136,7 @@ object ArmorPenetrationPercentAttribute : Attribute<AttributeInfo>(
     override fun readAttribute(lore: String): AttributeInfo? {
         var lore = lore
         lore = ChatColor.stripColor(lore)
-        if (lore.matches("[^护甲穿透]*护甲穿透( )*[+-][0-9.%]*".toRegex())) {
+        if (lore.matches("[^护甲穿透]*护甲穿透( )*[+-][0-9.]*%".toRegex())) {
             lore = lore.replace("[^0-9.%+-]".toRegex(), "")
             if (!lore.contains("%")) {
                 return null
